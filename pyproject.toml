@@ -19,6 +19,9 @@ dependencies = ["requests", "urllib3"]
 dynamic = ["version"]
 requires-python = ">=3.8"
 
+[project.scripts]
+pyalex = "pyalex.cli:main"
+
 [project.optional-dependencies]
 lint = ["ruff"]
 test = ["pytest", "pytest-xdist", "dotenv"]
