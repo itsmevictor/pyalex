@@ -451,6 +451,14 @@ class BaseOpenAlex:
 
             return self.filter_or(openalex_id=record_id).get(per_page=len(record_id))
         elif isinstance(record_id, str):
+            if isinstance(self.params, dict):
+                base_path = self.__class__.__name__.lower()
+                path = f"{base_path}/{_quote_oa_value(record_id)}"
+                query = self._url_query()
+                return self._get_from_url(
+                    urlunparse(("https", "api.openalex.org", path, "", query, ""))
+                )
+
             self.params = record_id
             return self._get_from_url(self.url)
         else:
@@ -543,10 +551,8 @@ class BaseOpenAlex:
             return OpenAlexResponseList(
                 res_json["results"], res_json["meta"], self.resource_class
             )
-        elif "id" in res_json:
-            return self.resource_class(res_json)
         else:
-            raise ValueError("Unknown response format")
+            return self.resource_class(res_json)
 
     def get(self, return_meta=False, page=None, per_page=None, cursor=None):
         if per_page is not None and (
