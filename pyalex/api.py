@@ -926,10 +926,33 @@ class Work(OpenAlexEntity):
             return resp_list
 
 
+def _normalize_doi(doi):
+    """Normalize a DOI to the full URL format expected by OpenAlex.
+
+    Short DOIs like '10.1007/s10464-012-9550-6' are converted to
+    'https://doi.org/10.1007/s10464-012-9550-6'.
+    """
+    if isinstance(doi, str) and doi.startswith("10.") and "doi.org" not in doi:
+        return f"https://doi.org/{doi}"
+    return doi
+
+
 class Works(BaseOpenAlex):
     """Class representing a collection of work entities in OpenAlex."""
 
     resource_class = Work
+
+    def __getitem__(self, record_id):
+        """Fetch a work by ID, DOI, or list of IDs.
+
+        DOIs can be provided in short form (e.g., '10.1007/s10464-012-9550-6')
+        or full URL form (e.g., 'https://doi.org/10.1007/s10464-012-9550-6').
+        """
+        if isinstance(record_id, str):
+            record_id = _normalize_doi(record_id)
+        elif isinstance(record_id, list):
+            record_id = [_normalize_doi(rid) for rid in record_id]
+        return super().__getitem__(record_id)
 
 
 class Author(OpenAlexEntity):

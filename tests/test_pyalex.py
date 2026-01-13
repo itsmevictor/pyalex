@@ -405,6 +405,15 @@ def test_filter_urlencoding():
     )
 
 
+def test_short_doi_lookup():
+    # Short DOI without https://doi.org/ prefix should work
+    work = Works()["10.1007/s10464-012-9550-6"]
+    assert work["doi"] == "https://doi.org/10.1007/s10464-012-9550-6"
+    # Full DOI URL should still work
+    work_full = Works()["https://doi.org/10.1007/s10464-012-9550-6"]
+    assert work_full["id"] == work["id"]
+
+
 def test_urlencoding_list():
     assert (
         Works()
